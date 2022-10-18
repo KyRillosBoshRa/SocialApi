@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 host = 'localhost'
 database = 'SocialApi'
 user = 'postgres'
-password = ''
+password = '6279'
 
 SQLALCHEMY_DATABASE_URL = f'postgresql://{user}:{password}@{host}/{database}'
 
