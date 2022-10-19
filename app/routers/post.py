@@ -7,12 +7,13 @@ from sqlalchemy.orm import Session
 router = APIRouter(prefix='/posts', tags=['Posts'])
 
 @router.get('/', response_model=list[schemas.PostRespanse])
-async def get_posts(db: Session = Depends(database.get_db)):
-  posts = db.query(models.Post).all()
+async def get_posts(db: Session = Depends(database.get_db), user: dict = Depends(get_current_user),
+                      limit: int = 10, skip: int = 0, search: str = ''):
+  posts = db.query(models.Post).filter(models.Post.title.contains(search)).offset(skip).limit(limit).all()
   return posts
 
 @router.get('/{id}', response_model=schemas.PostRespanse)
-async def get_post(id: int, db: Session = Depends(database.get_db)):
+async def get_post(id: int, db: Session = Depends(database.get_db), user: dict = Depends(get_current_user)):
   post = db.query(models.Post).filter(models.Post.id == id).one_or_none()
   if not post:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'sorry post with id: {id} not found')
@@ -20,8 +21,8 @@ async def get_post(id: int, db: Session = Depends(database.get_db)):
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=schemas.PostRespanse)
 async def create_post(post: schemas.PostCreate, db: Session = Depends(database.get_db),
-                                              user_id: int = Depends(get_current_user)):
-  new_post = models.Post(**post.dict())
+                                              user: dict = Depends(get_current_user)):
+  new_post = models.Post(**post.dict(), user_id = user.id)
   db.add(new_post)
   db.commit()
   db.refresh(new_post)
@@ -29,19 +30,25 @@ async def create_post(post: schemas.PostCreate, db: Session = Depends(database.g
 
 @router.put('/{id}', response_model=schemas.PostRespanse)
 async def update_post(id: int, post: schemas.PostCreate, db: Session = Depends(database.get_db),
-                                              user_id: int = Depends(get_current_user)):
-  updated_post = db.query(models.Post).filter(models.Post.id == id)
-  if not updated_post.one_or_none():
+                                              user: dict = Depends(get_current_user)):
+  updated_post_query = db.query(models.Post).filter(models.Post.id == id)
+  updated_post = updated_post_query.one_or_none()
+  if not updated_post:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'sorry post with id: {id} not found')
-  updated_post.update(post.dict(), synchronize_session=False)
+  if user.id != updated_post.user.id:
+    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f'sorry you need to be the post creator in order to update it')
+  updated_post_query.update(post.dict(), synchronize_session=False)
   db.commit()
-  return updated_post.one()
+  return updated_post_query.one()
 
 @router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_post(id: int, db: Session = Depends(database.get_db),
-                                              user_id: int = Depends(get_current_user)):
-  post = db.query(models.Post).filter(models.Post.id == id)
-  if not post.one_or_none():
+                                              user: dict = Depends(get_current_user)):
+  post_query = db.query(models.Post).filter(models.Post.id == id)
+  post = post_query.one_or_none()
+  if not post:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'sorry post with id: {id} not found')
-  post.delete(synchronize_session=False)
+  if user.id != post.user.id:
+    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f'sorry you need to be the post creator in order to delete it')
+  post_query.delete(synchronize_session=False)
   db.commit()

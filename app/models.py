@@ -1,12 +1,13 @@
-from enum import unique
-from sqlite3 import Timestamp
 from .database import Base
-from sqlalchemy import Column, String, Integer, Boolean, TIMESTAMP, text
+from sqlalchemy import Column, String, Integer, Boolean, TIMESTAMP, text, ForeignKey
+from sqlalchemy.orm import relationship
 
 class Post(Base):
   __tablename__ = 'posts'
 
   id = Column(Integer, primary_key = True, nullable = False)
+  user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+  user = relationship('User')
   title = Column(String, nullable = False)
   content = Column(String, nullable = False)
   published = Column(Boolean, server_default = 'TRUE', nullable = False)
