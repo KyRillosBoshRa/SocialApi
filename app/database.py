@@ -1,11 +1,12 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from .config import settings
 
-host = 'localhost'
-database = 'SocialApi'
-user = 'postgres'
-password = '6279'
+host = settings.database_hostname
+database = settings.database_name
+user = settings.database_username
+password = settings.database_password
 
 SQLALCHEMY_DATABASE_URL = f'postgresql://{user}:{password}@{host}/{database}'
 
