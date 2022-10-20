@@ -30,6 +30,9 @@ class PostRespanse(PostBase):
   class Config:
     orm_mode = True
 
+class PostRespanseWL(PostRespanse):
+  likes: int
+  
 
 
 class Token(BaseModel):
@@ -38,3 +41,9 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
   id: int | None = None
+
+
+
+class Like(BaseModel):
+  post_id: int
+  direction: bool
