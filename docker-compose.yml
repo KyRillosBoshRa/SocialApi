@@ -1,0 +1,24 @@
+version: '3.8'
+services: 
+  api:
+    build: .
+    depends_on:
+      - postgres
+    ports:
+      - 8000:8000
+    volumes:
+      - ./:/usr/src/app:ro
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    env_file:
+      - ./.env
+    environment:
+      - DATABASE_HOSTNAME=postgres
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_DB=SocialApi
+      - POSTGRES_PASSWORD=6279
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+volumes:
+  postgres-db:
