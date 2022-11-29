@@ -3,9 +3,10 @@ from . import models, database
 from .routers import user, post, auth, like
 from fastapi.middleware.cors import CORSMiddleware
 
-models.Base.metadata.create_all(bind=database.engine)
-
 app = FastAPI()
+
+if __name__ == '__main__':
+  models.Base.metadata.create_all(bind=database.engine)
 
 origins = ['*']
 
