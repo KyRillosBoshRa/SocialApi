@@ -43,6 +43,7 @@ jobs:
       - name: Test with pytest
         run: pytest --asyncio-mode=auto -s -v
   deploy:
+    needs: [build]
     environment:
       name: production
     runs-on: ubuntu-latest
