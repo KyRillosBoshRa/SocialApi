@@ -20,7 +20,7 @@ requirements.txt
 
 A step by step series of examples that tell you how to get a development env running
 
-first you need to make your version of dot_env file then rename it to .env.
+first you need to make your version of dot_env file then rename it to .env
 
 then:
 
