@@ -1,0 +1,11 @@
+#please change those variable depending on your environment
+#then change the file name to .env
+DATABASE_HOSTNAME=localhost
+DATABASE_PORT=5432
+DATABASE_NAME=SocialApi
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=0000
+
+SECRET_KEY=09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa57f63b88e8d3e4
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=60
